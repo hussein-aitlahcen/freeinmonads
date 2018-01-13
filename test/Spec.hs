@@ -30,8 +30,9 @@ main = hspec $ do
       let (Identity x) = testRun 5
       x `shouldBe` (5 + 5)
 
--- Hand made monad
--- Our logic is pure even if readF launch missiles, thanks to our monad being free of effects
+-- Our logic is pure except if readF launch missiles, the return type and monad type depends
+-- on the algebra we wants to apply.
+-- Here, we are simply consuming integer and producing integer.
 test :: Free (CommandF Int) Int
 test = withCommandF $ do
     x <- readF
