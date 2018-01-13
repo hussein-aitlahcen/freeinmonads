@@ -1,0 +1,39 @@
+name:                freeinmonads
+version:             0.1.0.0
+github:              "hussein-aitlahcen/freeinmonads"
+license:             GPL-3
+author:              "Hussein Ait Lahcen"
+maintainer:          "hussein.aitlahcen@gmail.com"
+copyright:           "2018 Hussein Ait Lahcen"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/hussein-aitlahcen/freeinmonads#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- free
+- mtl
+- hspec
+
+library:
+  source-dirs: src
+
+tests:
+  freeinmonads-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - freeinmonads
