@@ -31,6 +31,7 @@ main = hspec $ do
       x `shouldBe` (5 + 5)
 
 -- Hand made monad
+-- Our logic is pure even if readF launch missiles, thanks to our monad being free of effects
 test :: Free (CommandF Int) Int
 test = do
   n <- withCommandF $ do
@@ -39,6 +40,7 @@ test = do
     pure $ x + y
   pure n
 
+-- We abstract away the effects, executing them by running the commands
 -- testRun :: IO Int
 -- testRun = runCommand (read <$> getLine) (putStrLn . show) test
 
