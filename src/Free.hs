@@ -31,14 +31,14 @@ import           Control.Monad.Free
 import           Control.Monad.Free.TH
 import           Control.Monad.IO.Class
 
-data CommandF a next where
-  ReadF        :: (a                  -> next) -> CommandF a next
-  WriteF       :: a                   -> next  -> CommandF a next
-  WithCommandF :: Free (CommandF a) a -> (a    -> next) -> CommandF a next
+data CommandF a n where
+  ReadF        :: (a -> n) -> CommandF a n
+  WriteF       :: a -> n  -> CommandF a n
+  WithCommandF :: Free (CommandF a) a -> (a -> n) -> CommandF a n
 
 instance Functor (CommandF a) where
   fmap f (ReadF nf)         = ReadF (f . nf)
-  fmap f (WriteF s next)    = WriteF s (f next)
+  fmap f (WriteF s nf)      = WriteF s (f nf)
   fmap f (WithCommandF b g) = WithCommandF b (f . g)
 
 makeFreeCon 'ReadF
