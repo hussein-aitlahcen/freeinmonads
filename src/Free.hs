@@ -34,18 +34,15 @@ import           Control.Monad.IO.Class
 data CommandF a next where
   ReadF        :: (a                  -> next) -> CommandF a next
   WriteF       :: a                   -> next  -> CommandF a next
-  EndWithF     :: a                   -> CommandF a next
   WithCommandF :: Free (CommandF a) a -> (a    -> next) -> CommandF a next
 
 instance Functor (CommandF a) where
   fmap f (ReadF nf)         = ReadF (f . nf)
   fmap f (WriteF s next)    = WriteF s (f next)
-  fmap f (EndWithF v)       = EndWithF v
   fmap f (WithCommandF b g) = WithCommandF b (f . g)
 
 makeFreeCon 'ReadF
 makeFreeCon 'WriteF
-makeFreeCon 'EndWithF
 makeFreeCon_ 'WithCommandF
 withCommandF :: MonadFree (CommandF a) m => Free (CommandF a) a -> m a
 
@@ -54,6 +51,5 @@ runCommand inf outf = iterM exec
   where
     exec (ReadF f)          = inf >>= f
     exec (WriteF v f)       = outf v >> f
-    exec (EndWithF v)       = pure v
     exec (WithCommandF b f) = runCommand inf outf b >>= f
 
