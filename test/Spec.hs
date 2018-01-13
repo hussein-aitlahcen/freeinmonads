@@ -38,9 +38,12 @@ test = withCommandF $ do
     y <- readF
     pure $ x + y
 
--- We abstract away the effects, executing them by running the commands
+-- Here is an example of side-effect functions to read/write, obviously, our computation gets wrapped into IO.
 -- testRun :: IO Int
 -- testRun = runCommand (read <$> getLine) (putStrLn . show) test
 
+
+-- Pure code that is side-effects free. You can understand the power of having a custom interpreter
+-- for testing purposes.
 testRun :: Int -> Identity Int
 testRun input = runCommand (pure input) (const . pure $ ()) test
