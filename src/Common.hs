@@ -1,4 +1,4 @@
--- Spec.hs ---
+-- Common.hs ---
 
 -- Copyright (C) 2018 Hussein Ait-Lahcen
 
@@ -17,28 +17,30 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import           Common
-import           Control.Monad
+{-# LANGUAGE TypeOperators #-}
+
+module Common where
+
 import           Control.Monad.Free
-import           Control.Monad.Identity
-import           Program
-import           Test.Hspec
 import           Types
 
-main :: IO ()
-main = hspec $ do
-  describe "how free am I in this monad ?" $ do
-    it "is obviously freedom" $ do
-      let (Identity output) = programExec apiExec consExec dbExec program
-      output `shouldBe` "Hello, World !"
+liftApi :: ApiCommandF a n -> ProgramF a b c n
+liftApi = liftF . InL . InL
 
-dbExec :: DbCommandF String (Identity String) -> Identity String
-dbExec (FetchF i f) = f (show i)
-dbExec (SaveF i s f) = f
+liftConsole :: ConsoleCommandF a n -> ProgramF b a c n
+liftConsole = liftF . InL . InR
 
-apiExec :: ApiCommandF String (Identity String) -> Identity String
-apiExec (GetF s f) = f "Hello, World !"
+liftDb :: DbCommandF a n -> ProgramF b c a n
+liftDb = liftF . InR
 
-consExec :: ConsoleCommandF Int (Identity String) -> Identity String
-consExec (ReadF f) = f 1
-consExec (WriteF v f) = f
+programExec :: (Functor f, Functor g, Functor h, Monad m)
+            => (f (m a) -> m a)
+            -> (g (m a) -> m a)
+            -> (h (m a) -> m a)
+            -> Free (f :+: g :+: h) a
+            -> m a
+programExec apiExec consExec dbExec prog = iterM exec prog
+  where
+    exec (InR dbCmd) = dbExec dbCmd
+    exec (InL (InL apiCmd)) = apiExec apiCmd
+    exec (InL (InR consCmd)) = consExec consCmd

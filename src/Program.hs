@@ -1,4 +1,4 @@
--- Spec.hs ---
+-- Program.hs ---
 
 -- Copyright (C) 2018 Hussein Ait-Lahcen
 
@@ -17,28 +17,36 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+module Program where
+
 import           Common
 import           Control.Monad
 import           Control.Monad.Free
 import           Control.Monad.Identity
-import           Program
-import           Test.Hspec
 import           Types
 
-main :: IO ()
-main = hspec $ do
-  describe "how free am I in this monad ?" $ do
-    it "is obviously freedom" $ do
-      let (Identity output) = programExec apiExec consExec dbExec program
-      output `shouldBe` "Hello, World !"
+type ProgramA = ProgramF String Int String
 
-dbExec :: DbCommandF String (Identity String) -> Identity String
-dbExec (FetchF i f) = f (show i)
-dbExec (SaveF i s f) = f
+apiGet :: String -> ProgramA String
+apiGet s = liftApi (GetF s id)
 
-apiExec :: ApiCommandF String (Identity String) -> Identity String
-apiExec (GetF s f) = f "Hello, World !"
+consoleRead :: ProgramA Int
+consoleRead = liftConsole (ReadF id)
 
-consExec :: ConsoleCommandF Int (Identity String) -> Identity String
-consExec (ReadF f) = f 1
-consExec (WriteF v f) = f
+consoleWrite :: Int -> ProgramA ()
+consoleWrite v = liftConsole (WriteF v ())
+
+dbFetch :: Int -> ProgramA String
+dbFetch i = liftDb (FetchF i id)
+
+dbSave :: Int -> String -> ProgramA ()
+dbSave i s = liftDb (SaveF i s ())
+
+program :: ProgramA String
+program = do
+  _ <- consoleWrite 1
+  apiValue <- apiGet "http://localhost/users"
+  _ <- dbSave 0 apiValue
+  _ <- consoleWrite 1
+  pure $ apiValue
+
