@@ -35,8 +35,8 @@ data ConsoleCommandF a n = ReadF (a -> n)
                          | WriteF a n
                          deriving Functor
 
-data DbCommandF a n = FetchF Int (String -> n)
-                    | SaveF Int String n
+data DbCommandF a n = FetchF Int (a -> n)
+                    | SaveF Int a n
                     deriving Functor
 
 type ProgramF a b c = Free (ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c)
