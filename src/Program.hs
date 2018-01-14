@@ -27,7 +27,7 @@ import           Types
 
 type ProgramA = ProgramF String Int String
 
-apiGet :: String -> ProgramA String
+apiGet :: Url -> ProgramA String
 apiGet s = liftApi (GetF s id)
 
 consoleRead :: ProgramA Int
@@ -36,10 +36,10 @@ consoleRead = liftConsole (ReadF id)
 consoleWrite :: Int -> ProgramA ()
 consoleWrite v = liftConsole (WriteF v ())
 
-dbFetch :: Int -> ProgramA String
+dbFetch :: ObjectId -> ProgramA String
 dbFetch i = liftDb (FetchF i id)
 
-dbSave :: Int -> String -> ProgramA ()
+dbSave :: ObjectId -> String -> ProgramA ()
 dbSave i s = liftDb (SaveF i s ())
 
 program :: ProgramA String

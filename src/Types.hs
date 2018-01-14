@@ -25,6 +25,7 @@ module Types where
 import Control.Monad.Free
 
 type Url = String
+type ObjectId = Int
 
 data (f :+: g) e = InL (f e) | InR (g e) deriving Functor
 
@@ -35,8 +36,8 @@ data ConsoleCommandF a n = ReadF (a -> n)
                          | WriteF a n
                          deriving Functor
 
-data DbCommandF a n = FetchF Int (a -> n)
-                    | SaveF Int a n
+data DbCommandF a n = FetchF ObjectId (a -> n)
+                    | SaveF ObjectId a n
                     deriving Functor
 
 type ProgramF a b c = Free (ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c)
