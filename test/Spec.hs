@@ -29,16 +29,16 @@ main :: IO ()
 main = hspec $ do
   describe "how free am I in this monad ?" $ do
     it "is obviously freedom" $ do
-      let (Identity output) = programExec apiExec consExec dbExec program
+      output <- programExec apiExec consExec dbExec program
       output `shouldBe` "Hello, World !"
 
-dbExec :: DbCommandF String (Identity String) -> Identity String
-dbExec (FetchF i f) = f (show i)
-dbExec (SaveF i s f) = f
+dbExec :: DbCommandF String (IO String) -> IO String
+dbExec (FetchF i f) = f $ show i
+dbExec (SaveF i s f) = putStrLn ("saving objectid: " ++ show i) >> f
 
-apiExec :: ApiCommandF String (Identity String) -> Identity String
+apiExec :: ApiCommandF String (IO String) -> IO String
 apiExec (GetF s f) = f "Hello, World !"
 
-consExec :: ConsoleCommandF Int (Identity String) -> Identity String
-consExec (ReadF f) = f 1
-consExec (WriteF v f) = f
+consExec :: ConsoleCommandF String (IO String) -> IO String
+consExec (ReadF f) = f "Dude"
+consExec (WriteF v f) = putStrLn v >> f

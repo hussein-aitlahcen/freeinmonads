@@ -25,28 +25,29 @@ import           Control.Monad.Free
 import           Control.Monad.Identity
 import           Types
 
-type ProgramA = ProgramF String Int String
+type ProgramA = ProgramF String String String
 
 apiGet :: Url -> ProgramA String
 apiGet s = liftApi (GetF s id)
 
-consoleRead :: ProgramA Int
+consoleRead :: ProgramA  String
 consoleRead = liftConsole (ReadF id)
 
-consoleWrite :: Int -> ProgramA ()
+consoleWrite :: String -> ProgramA  ()
 consoleWrite v = liftConsole (WriteF v ())
 
-dbFetch :: ObjectId -> ProgramA String
+dbFetch :: ObjectId -> ProgramA  String
 dbFetch i = liftDb (FetchF i id)
 
-dbSave :: ObjectId -> String -> ProgramA ()
+dbSave :: ObjectId -> String -> ProgramA  ()
 dbSave i s = liftDb (SaveF i s ())
 
 program :: ProgramA String
 program = do
-  _ <- consoleWrite 1
+  consoleWrite "befire api get"
+  a <- consoleRead
+  consoleWrite a
   apiValue <- apiGet "http://localhost/users"
-  _ <- dbSave 0 apiValue
-  _ <- consoleWrite 1
-  pure $ apiValue
-
+  dbSave 10 apiValue
+  consoleWrite "after api get & db save"
+  pure apiValue
