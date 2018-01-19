@@ -41,6 +41,6 @@ programExec :: (Functor f, Functor g, Functor h, Monad m)
             -> m a
 programExec apiExec consExec dbExec prog = iterM exec prog
   where
-    exec (InR dbCmd) = dbExec dbCmd
-    exec (InL (InL apiCmd)) = apiExec apiCmd
+    exec (InR dbCmd)         = dbExec dbCmd
+    exec (InL (InL apiCmd))  = apiExec apiCmd
     exec (InL (InR consCmd)) = consExec consCmd
