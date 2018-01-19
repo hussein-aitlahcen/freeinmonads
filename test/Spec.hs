@@ -33,12 +33,12 @@ main = hspec $ do
       output `shouldBe` "Hello, World !"
 
 dbExec :: DbCommandF String (IO String) -> IO String
-dbExec (FetchF i f) = f $ show i
+dbExec (FetchF i f)  = f $ show i
 dbExec (SaveF i s f) = putStrLn ("saving objectid: " ++ show i) >> f
 
 apiExec :: ApiCommandF String (IO String) -> IO String
 apiExec (GetF s f) = f "Hello, World !"
 
 consExec :: ConsoleCommandF String (IO String) -> IO String
-consExec (ReadF f) = f "Dude"
+consExec (ReadF f)    = f "Dude"
 consExec (WriteF v f) = putStrLn v >> f
