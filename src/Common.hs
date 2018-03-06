@@ -24,8 +24,8 @@ module Common where
 import           Control.Monad.Free
 import           Types
 
-inFree :: (Functor f, f :<: g) => f a -> Free g a
-inFree = hoistFree inj . liftF
+injectFree :: (Functor f, f :<: g) => f a -> Free g a
+injectFree = hoistFree inj . liftF
 
 programExec
   :: (Functor f, Functor g, Functor h, Monad m)

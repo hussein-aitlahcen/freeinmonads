@@ -28,19 +28,19 @@ import           Types
 type ProgramA = Free (ProgramF String String String)
 
 apiGet :: Url -> ProgramA String
-apiGet s = inFree (GetF s id)
+apiGet s = injectFree (GetF s id)
 
 consoleRead :: ProgramA String
-consoleRead = inFree (ReadF id)
+consoleRead = injectFree (ReadF id)
 
 consoleWrite :: String -> ProgramA ()
-consoleWrite v = inFree (WriteF v ())
+consoleWrite v = injectFree (WriteF v ())
 
 dbFetch :: ObjectId -> ProgramA  String
-dbFetch i = inFree (FetchF i id)
+dbFetch i = injectFree (FetchF i id)
 
-  dbSave :: ObjectId -> String -> ProgramA  ()
-dbSave i s = inFree (SaveF i s ())
+dbSave :: ObjectId -> String -> ProgramA  ()
+dbSave i s = injectFree (SaveF i s ())
 
 program :: ProgramA String
 program = do
