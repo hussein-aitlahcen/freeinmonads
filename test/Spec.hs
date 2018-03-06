@@ -26,19 +26,43 @@ import           Test.Hspec
 import           Types
 
 main :: IO ()
-main = hspec $ do
-  describe "how free am I in this monad ?" $ do
-    it "is obviously freedom" $ do
-      output <- programExec apiExec consExec dbExec program
-      output `shouldBe` "Hello, World !"
+main = hspec $
+  describe "how free am I in this monad ?" $
+    it "is obviously freedom" $
+      let
+        --- Pure interpreter can be replaced by the impure one
+        output = runIdentity $ programExec pureApiExec pureConsExec pureDbExec program
+      in
+        output `shouldBe` "Hello, World !"
 
+{-
+############################################################
+                  Impure Interpreter
+############################################################
+-}
 dbExec :: DbCommandF String (IO String) -> IO String
-dbExec (FetchF i f)  = f $ show i
-dbExec (SaveF i s f) = putStrLn ("saving objectid: " ++ show i) >> f
+dbExec (FetchF i f)  = f (show i)
+dbExec (SaveF i s f) = putStrLn ("Saving ObjectId: " ++ show i) >> f
 
 apiExec :: ApiCommandF String (IO String) -> IO String
-apiExec (GetF s f) = f "Hello, World !"
+apiExec (GetF s f) = f =<< getLine
 
 consExec :: ConsoleCommandF String (IO String) -> IO String
-consExec (ReadF f)    = f "Dude"
+consExec (ReadF f)    = f =<< getLine
 consExec (WriteF v f) = putStrLn v >> f
+
+{-
+############################################################
+                   Pure Interpreter
+############################################################
+-}
+pureDbExec :: DbCommandF String (Identity String) -> Identity String
+pureDbExec (FetchF i f)  = f (show i)
+pureDbExec (SaveF i s f) = f
+
+pureApiExec :: ApiCommandF String (Identity String) -> Identity String
+pureApiExec (GetF s f) = f "Hello, World !"
+
+pureConsExec :: ConsoleCommandF String (Identity String) -> Identity String
+pureConsExec (ReadF f)    = f "Console input"
+pureConsExec (WriteF v f) = f

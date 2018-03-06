@@ -19,6 +19,8 @@
 
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Types where
 
@@ -27,7 +29,21 @@ import Control.Monad.Free
 type Url = String
 type ObjectId = Int
 
-data (f :+: g) e = InL (f e) | InR (g e) deriving Functor
+-- Credits to DataTypes A La Carte http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
+-- by Wounder Swierstra
+data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
+
+class (Functor f, Functor g) => f :<: g where
+  inj :: f a -> g a
+
+instance Functor f => f :<: f where
+  inj = id
+
+instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
+  inj = InR
+
+instance (Functor f, Functor g, Functor h, g :<: h) => g :<: (h :+: f) where
+  inj = InL . inj
 
 data ApiCommandF a n = GetF Url (a -> n)
                      deriving Functor
@@ -40,4 +56,4 @@ data DbCommandF a n = FetchF ObjectId (a -> n)
                     | SaveF ObjectId a n
                     deriving Functor
 
-type ProgramF a b c = Free (ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c)
+type ProgramF a b c = ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c

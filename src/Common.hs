@@ -17,30 +17,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators    #-}
 
 module Common where
 
 import           Control.Monad.Free
 import           Types
 
-liftApi :: ApiCommandF a n -> ProgramF a b c n
-liftApi = liftF . InL . InL
+inFree :: (Functor f, f :<: g) => f a -> Free g a
+inFree = hoistFree inj . liftF
 
-liftConsole :: ConsoleCommandF a n -> ProgramF b a c n
-liftConsole = liftF . InL . InR
-
-liftDb :: DbCommandF a n -> ProgramF b c a n
-liftDb = liftF . InR
-
-programExec :: (Functor f, Functor g, Functor h, Monad m)
-            => (f (m a) -> m a)
-            -> (g (m a) -> m a)
-            -> (h (m a) -> m a)
-            -> Free (f :+: g :+: h) a
-            -> m a
-programExec apiExec consExec dbExec prog = iterM exec prog
+programExec
+  :: (Functor f, Functor g, Functor h, Monad m)
+     => (f (m a) -> m a)
+     -> (g (m a) -> m a)
+     -> (h (m a) -> m a)
+     -> Free ((f :+: g) :+: h) a
+     -> m a
+programExec fExec gExec hExec = iterM exec
   where
-    exec (InR dbCmd)         = dbExec dbCmd
-    exec (InL (InL apiCmd))  = apiExec apiCmd
-    exec (InL (InR consCmd)) = consExec consCmd
+    exec (InR hCmd)       = hExec hCmd
+    exec (InL (InR gCmd)) = gExec gCmd
+    exec (InL (InL fCmd)) = fExec fCmd

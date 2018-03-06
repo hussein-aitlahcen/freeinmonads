@@ -25,22 +25,22 @@ import           Control.Monad.Free
 import           Control.Monad.Identity
 import           Types
 
-type ProgramA = ProgramF String String String
+type ProgramA = Free (ProgramF String String String)
 
 apiGet :: Url -> ProgramA String
-apiGet s = liftApi (GetF s id)
+apiGet s = inFree (GetF s id)
 
-consoleRead :: ProgramA  String
-consoleRead = liftConsole (ReadF id)
+consoleRead :: ProgramA String
+consoleRead = inFree (ReadF id)
 
-consoleWrite :: String -> ProgramA  ()
-consoleWrite v = liftConsole (WriteF v ())
+consoleWrite :: String -> ProgramA ()
+consoleWrite v = inFree (WriteF v ())
 
 dbFetch :: ObjectId -> ProgramA  String
-dbFetch i = liftDb (FetchF i id)
+dbFetch i = inFree (FetchF i id)
 
-dbSave :: ObjectId -> String -> ProgramA  ()
-dbSave i s = liftDb (SaveF i s ())
+  dbSave :: ObjectId -> String -> ProgramA  ()
+dbSave i s = inFree (SaveF i s ())
 
 program :: ProgramA String
 program = do
