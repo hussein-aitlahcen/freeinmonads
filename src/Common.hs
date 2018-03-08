@@ -32,7 +32,7 @@ programExec
      => (f (m a) -> m a)
      -> (g (m a) -> m a)
      -> (h (m a) -> m a)
-     -> Free ((f :+: g) :+: h) a
+     -> Free (f :+: g :+: h) a
      -> m a
 programExec fExec gExec hExec = iterM exec
   where

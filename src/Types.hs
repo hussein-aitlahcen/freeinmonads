@@ -42,7 +42,7 @@ instance Functor f => f :<: f where
 instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
   inj = InR
 
-instance (Functor f, Functor g, Functor h, g :<: h) => g :<: (h :+: f) where
+instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
   inj = InL . inj
 
 data ApiCommandF a n = GetF Url (a -> n)
