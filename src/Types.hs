@@ -17,14 +17,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeOperators         #-}
 
 module Types where
 
-import Control.Monad.Free
+import           Control.Monad.Free
 
 type Url = String
 type ObjectId = Int
