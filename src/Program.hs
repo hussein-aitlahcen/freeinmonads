@@ -20,12 +20,9 @@
 module Program where
 
 import           Common
-import           Control.Monad
-import           Control.Monad.Free
-import           Control.Monad.Identity
 import           Types
 
-type ProgramA = Free (ProgramF String String String)
+type ProgramA = ProgramF String String String
 
 apiGet :: Url -> ProgramA String
 apiGet s = injectFree (GetF s id)

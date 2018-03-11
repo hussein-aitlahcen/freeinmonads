@@ -33,18 +33,6 @@ type ObjectId = Int
 -- by Wounder Swierstra
 data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
 
-class (Functor f, Functor g) => f :<: g where
-  inj :: f a -> g a
-
-instance Functor f => f :<: f where
-  inj = id
-
-instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
-  inj = InR
-
-instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
-  inj = InL . inj
-
 data ApiCommandF a n = GetF Url (a -> n)
                      deriving Functor
 
@@ -56,4 +44,19 @@ data DbCommandF a n = FetchF ObjectId (a -> n)
                     | SaveF ObjectId a n
                     deriving Functor
 
-type ProgramF a b c = ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c
+type Program a b c = ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c
+
+type ProgramF a b c = Free (Program a b c)
+
+class (Functor f, Functor g) => f :<: g where
+  inj :: f a -> g a
+
+instance Functor f => f :<: f where
+  inj = id
+
+instance {-# OVERLAPS #-} (Functor f, Functor g) => f :<: (g :+: f) where
+  inj = InR
+
+instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
+  inj = InL . inj
+
