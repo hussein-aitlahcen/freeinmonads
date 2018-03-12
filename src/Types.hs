@@ -58,11 +58,11 @@ instance Functor f => f :<: f where
 
 instance {-# OVERLAPS #-} (Functor f, Functor g) => f :<: (g :+: f) where
   inj = InR
-  proj (InR x) = Just x
+  proj (InR fa) = Just fa
   proj _ = Nothing
 
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
   inj = InL . inj
-  proj (InL x) = proj x
+  proj (InL gfa) = proj gfa
   proj _ = Nothing
 
