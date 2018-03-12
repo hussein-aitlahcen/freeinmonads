@@ -50,13 +50,19 @@ type ProgramF a b c = Free (Program a b c)
 
 class (Functor f, Functor g) => f :<: g where
   inj :: f a -> g a
+  proj :: g a -> Maybe (f a)
 
 instance Functor f => f :<: f where
   inj = id
+  proj = Just
 
 instance {-# OVERLAPS #-} (Functor f, Functor g) => f :<: (g :+: f) where
   inj = InR
+  proj (InR x) = Just x
+  proj _ = Nothing
 
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
   inj = InL . inj
+  proj (InL x) = proj x
+  proj _ = Nothing
 
