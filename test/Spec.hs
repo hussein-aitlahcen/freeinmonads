@@ -17,52 +17,18 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import           Common
-import           Control.Monad
-import           Control.Monad.Free
-import           Control.Monad.Identity
-import           Program
+import           Core.Common
+import           Program.Instances
 import           Test.Hspec
-import           Types
+
+import           Control.Monad.Identity
 
 main :: IO ()
 main = hspec $
   describe "how free am I in this monad ?" $
     it "is obviously freedom" $
       let
-        --- Pure interpreter can be replaced by the impure one
-        output = runIdentity $ programExec pureApiExec pureConsExec pureDbExec program
+        --- the interpreter is inferred
+        output = (runIdentity . programExec) programA
       in
         output `shouldBe` "Hello, World !"
-
-{-
-############################################################
-                  Impure Interpreter
-############################################################
--}
-dbExec :: DbCommandF String (IO String) -> IO String
-dbExec (FetchF i f)  = f (show i)
-dbExec (SaveF i s f) = putStrLn ("Saving ObjectId: " ++ show i) >> f
-
-apiExec :: ApiCommandF String (IO String) -> IO String
-apiExec (GetF s f) = f =<< getLine
-
-consExec :: ConsoleCommandF String (IO String) -> IO String
-consExec (ReadF f)    = f =<< getLine
-consExec (WriteF v f) = putStrLn v >> f
-
-{-
-############################################################
-                   Pure Interpreter
-############################################################
--}
-pureDbExec :: DbCommandF String (Identity String) -> Identity String
-pureDbExec (FetchF i f)  = f (show i)
-pureDbExec (SaveF i s f) = f
-
-pureApiExec :: ApiCommandF String (Identity String) -> Identity String
-pureApiExec (GetF s f) = f "Hello, World !"
-
-pureConsExec :: ConsoleCommandF String (Identity String) -> Identity String
-pureConsExec (ReadF f)    = f "Console input"
-pureConsExec (WriteF v f) = f

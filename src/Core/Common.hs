@@ -19,23 +19,15 @@
 
 {-# LANGUAGE TypeOperators #-}
 
-module Common where
+module Core.Common where
 
-import           Control.Monad.Free
-import           Types
+import           Control.Monad.Free (Free, hoistFree, liftF, iterM)
+import           Core.Types (Interpretable(..), (:<:)(..))
 
 injectFree :: (Functor f, f :<: g) => f a -> Free g a
 injectFree = hoistFree inj . liftF
 
-programExec
-  :: (Functor f, Functor g, Functor h, Monad m)
-     => (f (m a) -> m a)
-     -> (g (m a) -> m a)
-     -> (h (m a) -> m a)
-     -> Free (f :+: g :+: h) a
-     -> m a
-programExec fExec gExec hExec = iterM exec
-  where
-    exec (InR hCmd)       = hExec hCmd
-    exec (InL (InR gCmd)) = gExec gCmd
-    exec (InL (InL fCmd)) = fExec fCmd
+programExec :: (Functor f, Interpretable m f, Monad m)
+               => Free f a
+               -> m a
+programExec = iterM interpretM

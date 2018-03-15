@@ -1,4 +1,4 @@
--- Program.hs ---
+-- Instances.hs ---
 
 -- Copyright (C) 2018 Hussein Ait-Lahcen
 
@@ -17,30 +17,48 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Program where
+{-# LANGUAGE ConstraintKinds  #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RankNTypes       #-}
+{-# LANGUAGE TypeOperators    #-}
 
-import           Common
-import           Types
+module Program.Instances where
 
-type ProgramA = ProgramF String String String
+import           Core.Common
+import           Core.Types
+import           Program.Types
 
-apiGet :: Url -> ProgramA String
+import           Control.Monad.Free
+
+type InjectableF f a b = forall g. (Functor g, f a :<: g) => Free g b
+
+apiGet :: Url -> InjectableF ApiCommandF String String
 apiGet s = injectFree (GetF s id)
 
-consoleRead :: ProgramA String
+consoleRead :: InjectableF ConsoleCommandF String String
 consoleRead = injectFree (ReadF id)
 
-consoleWrite :: String -> ProgramA ()
+consoleWrite :: String -> InjectableF ConsoleCommandF String ()
 consoleWrite v = injectFree (WriteF v ())
 
-dbFetch :: ObjectId -> ProgramA  String
+dbFetch :: ObjectId -> InjectableF DbCommandF String String
 dbFetch i = injectFree (FetchF i id)
 
-dbSave :: ObjectId -> String -> ProgramA  ()
+dbSave :: ObjectId -> String -> InjectableF DbCommandF String ()
 dbSave i s = injectFree (SaveF i s ())
 
-program :: ProgramA String
-program = do
+programA :: Free (ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String) String
+programA = do
+  consoleWrite "befire api get"
+  a <- consoleRead
+  consoleWrite a
+  apiValue <- apiGet "http://localhost/users"
+  dbSave 10 apiValue
+  consoleWrite "after api get & db save"
+  pure apiValue
+
+programB :: Free (DbCommandF String :+: ConsoleCommandF String :+: ApiCommandF String) String
+programB = do
   consoleWrite "befire api get"
   a <- consoleRead
   consoleWrite a

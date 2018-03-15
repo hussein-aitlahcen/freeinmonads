@@ -22,31 +22,17 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators         #-}
 
-module Types where
+module Core.Types where
+{-
+####################################################################
 
-import           Control.Monad.Free
+                          Abstract types
+          Credits to DataTypes A La Carte by Wounder Swierstra
+http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 
-type Url = String
-type ObjectId = Int
-
--- Credits to DataTypes A La Carte http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
--- by Wounder Swierstra
+####################################################################
+-}
 data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
-
-data ApiCommandF a n = GetF Url (a -> n)
-                     deriving Functor
-
-data ConsoleCommandF a n = ReadF (a -> n)
-                         | WriteF a n
-                         deriving Functor
-
-data DbCommandF a n = FetchF ObjectId (a -> n)
-                    | SaveF ObjectId a n
-                    deriving Functor
-
-type Program a b c = ApiCommandF a :+: ConsoleCommandF b :+: DbCommandF c
-
-type ProgramF a b c = Free (Program a b c)
 
 class (Functor f, Functor g) => f :<: g where
   inj :: f a -> g a
@@ -56,13 +42,19 @@ instance Functor f => f :<: f where
   inj = id
   proj = Just
 
-instance {-# OVERLAPS #-} (Functor f, Functor g) => f :<: (g :+: f) where
+instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
   inj = InR
   proj (InR fa) = Just fa
-  proj _ = Nothing
+  proj _        = Nothing
 
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
   inj = InL . inj
   proj (InL gfa) = proj gfa
-  proj _ = Nothing
+  proj _         = Nothing
 
+class (Monad m, Functor f) => Interpretable m f where
+  interpretM :: f (m a) -> m a
+
+instance (Monad m, Functor f, Functor g, Interpretable m f, Interpretable m g) => Interpretable m (f :+: g) where
+  interpretM (InR ga) = interpretM ga
+  interpretM (InL fa) = interpretM fa
