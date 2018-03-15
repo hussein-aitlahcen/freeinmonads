@@ -17,7 +17,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -36,7 +35,7 @@ http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 
 ####################################################################
 -}
-type InjectF f a b = forall g. (Functor g, f a :<: g) => Free g b
+type InjectTypeF f a b = forall g. (Functor (f a), Functor g, f a :<: g) => Free g b
 
 data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
 

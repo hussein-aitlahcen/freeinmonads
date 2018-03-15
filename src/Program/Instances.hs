@@ -19,7 +19,6 @@
 
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes       #-}
-{-# LANGUAGE TypeOperators    #-}
 
 module Program.Instances where
 
@@ -27,24 +26,22 @@ import           Core.Common
 import           Core.Types
 import           Program.Types
 
-import           Control.Monad.Free
-
-apiGet :: Url -> InjectF ApiCommandF String String
+apiGet :: Url -> InjectTypeF ApiCommandF String String
 apiGet s = injectFree (GetF s id)
 
-consoleRead :: InjectF ConsoleCommandF String String
+consoleRead :: InjectTypeF ConsoleCommandF String String
 consoleRead = injectFree (ReadF id)
 
-consoleWrite :: String -> InjectF ConsoleCommandF String ()
+consoleWrite :: String -> InjectTypeF ConsoleCommandF String ()
 consoleWrite v = injectFree (WriteF v ())
 
-dbFetch :: ObjectId -> InjectF DbCommandF String String
+dbFetch :: ObjectId -> InjectTypeF DbCommandF String String
 dbFetch i = injectFree (FetchF i id)
 
-dbSave :: ObjectId -> String -> InjectF DbCommandF String ()
+dbSave :: ObjectId -> String -> InjectTypeF DbCommandF String ()
 dbSave i s = injectFree (SaveF i s ())
 
-programA :: Free (ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String) String
+programA :: ProgramAF String String String String
 programA = do
   consoleWrite "befire api get"
   a <- consoleRead
@@ -54,7 +51,7 @@ programA = do
   consoleWrite "after api get & db save"
   pure apiValue
 
-programB :: Free (DbCommandF String :+: ConsoleCommandF String :+: ApiCommandF String) Int
+programB :: ProgramBF String String String Int
 programB = do
   consoleWrite "befire api get"
   a <- consoleRead

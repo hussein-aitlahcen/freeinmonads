@@ -24,7 +24,8 @@
 
 module Program.Types where
 
-import           Control.Monad.Identity
+import           Control.Monad.Free     (Free)
+import           Control.Monad.Identity (Identity)
 import           Core.Types
 
 {-
@@ -42,6 +43,10 @@ data ConsoleCommandF a n = ReadF (a -> n)
 data DbCommandF a n = FetchF ObjectId (a -> n)
                     | SaveF ObjectId a n
                     deriving Functor
+type ProgramA a b c  = ApiCommandF a :+: DbCommandF b :+: ConsoleCommandF c
+type ProgramB a b c  = DbCommandF a :+: ConsoleCommandF b :+: ApiCommandF c
+type ProgramAF a b c = Free (ProgramA a b c)
+type ProgramBF a b c = Free (ProgramB a b c)
 {-
 ############################################################
                    Pure Interpreter
@@ -72,3 +77,4 @@ instance Interpretable IO (ApiCommandF String) where
 instance Interpretable IO (ConsoleCommandF String) where
   interpretM (ReadF f)    = f =<< getLine
   interpretM (WriteF v f) = putStrLn v >> f
+

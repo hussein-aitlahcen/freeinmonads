@@ -29,6 +29,7 @@ main = hspec $
     it "is obviously freedom" $
       let
         --- the interpreter is inferred
-        output = (runIdentity . programExec) programA
+        outputA = (runIdentity . programExec) programA
+        outputB = (runIdentity . programExec) programB
       in
-        output `shouldBe` "Hello, World !"
+        (outputA, outputB) `shouldBe` ("Hello, World !", 4)

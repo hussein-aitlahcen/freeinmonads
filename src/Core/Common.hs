@@ -24,7 +24,7 @@ module Core.Common where
 import           Control.Monad.Free (Free, hoistFree, liftF, iterM)
 import           Core.Types (Interpretable(..), (:<:)(..))
 
-injectFree :: (Functor f, f :<: g) => f a -> Free g a
+injectFree :: (Functor f, Functor g, f :<: g) => f a -> Free g a
 injectFree = hoistFree inj . liftF
 
 programExec :: (Functor f, Interpretable m f, Monad m)
