@@ -17,7 +17,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE ConstraintKinds  #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes       #-}
 {-# LANGUAGE TypeOperators    #-}
@@ -30,21 +29,19 @@ import           Program.Types
 
 import           Control.Monad.Free
 
-type InjectableF f a b = forall g. (Functor g, f a :<: g) => Free g b
-
-apiGet :: Url -> InjectableF ApiCommandF String String
+apiGet :: Url -> InjectF ApiCommandF String String
 apiGet s = injectFree (GetF s id)
 
-consoleRead :: InjectableF ConsoleCommandF String String
+consoleRead :: InjectF ConsoleCommandF String String
 consoleRead = injectFree (ReadF id)
 
-consoleWrite :: String -> InjectableF ConsoleCommandF String ()
+consoleWrite :: String -> InjectF ConsoleCommandF String ()
 consoleWrite v = injectFree (WriteF v ())
 
-dbFetch :: ObjectId -> InjectableF DbCommandF String String
+dbFetch :: ObjectId -> InjectF DbCommandF String String
 dbFetch i = injectFree (FetchF i id)
 
-dbSave :: ObjectId -> String -> InjectableF DbCommandF String ()
+dbSave :: ObjectId -> String -> InjectF DbCommandF String ()
 dbSave i s = injectFree (SaveF i s ())
 
 programA :: Free (ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String) String
@@ -57,7 +54,7 @@ programA = do
   consoleWrite "after api get & db save"
   pure apiValue
 
-programB :: Free (DbCommandF String :+: ConsoleCommandF String :+: ApiCommandF String) String
+programB :: Free (DbCommandF String :+: ConsoleCommandF String :+: ApiCommandF String) Int
 programB = do
   consoleWrite "befire api get"
   a <- consoleRead
@@ -65,4 +62,4 @@ programB = do
   apiValue <- apiGet "http://localhost/users"
   dbSave 10 apiValue
   consoleWrite "after api get & db save"
-  pure apiValue
+  pure 4

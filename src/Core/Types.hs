@@ -17,12 +17,16 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+{-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE TypeOperators         #-}
 
 module Core.Types where
+
+import           Control.Monad.Free (Free)
 {-
 ####################################################################
 
@@ -32,6 +36,8 @@ http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 
 ####################################################################
 -}
+type InjectF f a b = forall g. (Functor g, f a :<: g) => Free g b
+
 data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
 
 class (Functor f, Functor g) => f :<: g where
@@ -58,3 +64,4 @@ class (Monad m, Functor f) => Interpretable m f where
 instance (Monad m, Functor f, Functor g, Interpretable m f, Interpretable m g) => Interpretable m (f :+: g) where
   interpretM (InR ga) = interpretM ga
   interpretM (InL fa) = interpretM fa
+
