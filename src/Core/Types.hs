@@ -25,14 +25,12 @@
 
 module Core.Types
   (
-    InjectTypeF,
     Interpretable (..),
     (:+:)(..),
     (:<:)(..)
   )
   where
 
-import           Control.Monad.Free (Free)
 {-
 ####################################################################
 
@@ -42,8 +40,6 @@ http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 
 ####################################################################
 -}
-type InjectTypeF f a b = forall g. (Functor (f a), Functor g, f a :<: g) => Free g b
-
 data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
 
 class (Functor f, Functor g) => f :<: g where

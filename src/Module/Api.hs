@@ -32,10 +32,11 @@ module Module.Api
   where
 
 import           Control.Monad.Identity (Identity)
-import           Core.Common            (injectFree)
-import           Core.Types             (InjectTypeF, Interpretable (..))
+import           Core.Common            (InjectTypeF, injectFree)
+import           Core.Types             (Interpretable (..))
 
 type Url = String
+
 data ApiCommandF a n = GetF Url (a -> n)
 
 instance Functor (ApiCommandF a) where

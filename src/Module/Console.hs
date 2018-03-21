@@ -32,8 +32,8 @@ module Module.Console
   where
 
 import           Control.Monad.Identity (Identity)
-import           Core.Common            (injectFree)
-import           Core.Types             (InjectTypeF, Interpretable (..))
+import           Core.Common            (InjectTypeF, injectFree)
+import           Core.Types             (Interpretable (..))
 
 data ConsoleCommandF a n = ReadF (a -> n)
                          | WriteF a n

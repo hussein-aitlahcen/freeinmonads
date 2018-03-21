@@ -33,8 +33,8 @@ module Module.Database
   where
 
 import           Control.Monad.Identity (Identity)
-import           Core.Common            (injectFree)
-import           Core.Types             (InjectTypeF, Interpretable (..))
+import           Core.Common            (InjectTypeF, injectFree)
+import           Core.Types             (Interpretable (..))
 
 type ObjectId = Int
 
