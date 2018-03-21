@@ -26,7 +26,7 @@ module Program.Dog
   where
 
 import           Control.Monad.Free (Free)
-import           Core.Types         ((:+:))
+import           Core.Types         ((:+:) (..))
 import           Module.Api         (ApiCommandF, apiGet)
 import           Module.Console     (ConsoleCommandF, consoleRead, consoleWrite)
 import           Module.Database    (DbCommandF, dbFetch, dbSave)
