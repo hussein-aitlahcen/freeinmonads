@@ -26,8 +26,8 @@
 module Core.Types
   (
     Interpretable (..),
-    (:+:)(..),
-    (:<:)(..)
+    (:+:) (..),
+    (:<:) (..)
   )
   where
 
