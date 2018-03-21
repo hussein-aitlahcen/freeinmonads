@@ -19,7 +19,12 @@
 
 {-# LANGUAGE TypeOperators #-}
 
-module Core.Common where
+module Core.Common
+  (
+    injectFree,
+    programExec
+  )
+  where
 
 import           Control.Monad.Free (Free, hoistFree, liftF, iterM)
 import           Core.Types (Interpretable(..), (:<:)(..))

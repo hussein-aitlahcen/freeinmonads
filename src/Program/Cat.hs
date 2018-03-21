@@ -1,4 +1,4 @@
--- Spec.hs ---
+-- Cat.hs ---
 
 -- Copyright (C) 2018 Hussein Ait-Lahcen
 
@@ -17,20 +17,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import           Test.Hspec
+{-# LANGUAGE TypeOperators #-}
 
-import           Control.Monad.Identity (runIdentity)
-import           Core.Common            (programExec)
-import           Program.Cat            (cat)
-import           Program.Dog            (dog)
+module Program.Cat
+  (
+    cat
+  )
+  where
 
-main :: IO ()
-main = hspec $
-  describe "how free am I in this monad ?" $
-    it "is obviously freedom" $
-      let
-        --- the interpreter is inferred
-        outputA = (runIdentity . programExec) cat
-        outputB = (runIdentity . programExec) dog
-      in
-        (outputA, outputB) `shouldBe` ("Hello, World !", 4)
+import           Control.Monad.Free (Free)
+import           Core.Types         ((:+:))
+import           Module.Api         (ApiCommandF, apiGet)
+import           Module.Console     (ConsoleCommandF, consoleRead, consoleWrite)
+import           Module.Database    (DbCommandF, dbFetch, dbSave)
+
+cat :: Free (ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String) String
+cat = do
+  consoleWrite "programA"
+  consoleWrite =<< consoleRead
+  apiValue <- apiGet "http://localhost/users"
+  dbSave 10 =<< dbFetch 10
+  consoleWrite "end programA"
+  pure apiValue

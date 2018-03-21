@@ -23,7 +23,14 @@
 {-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE TypeOperators         #-}
 
-module Core.Types where
+module Core.Types
+  (
+    InjectTypeF,
+    Interpretable (..),
+    (:+:)(..),
+    (:<:)(..)
+  )
+  where
 
 import           Control.Monad.Free (Free)
 {-
