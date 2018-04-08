@@ -29,16 +29,15 @@ module Core.Common
   )
   where
 
-import           Control.Monad.Free        (Free, hoistFree, liftF)
-import           Control.Monad.Free.Church (iterM, toF)
+import           Control.Monad.Free.Church (F (..), hoistF, iterM, liftF)
 import           Core.Types                ((:<:) (..), Interpretable (..))
 
 -- Intermediate type used to fix `f a b` and let the compiler infers `g`
-type InjectTypeF f a b = forall g. (Functor (f a), Functor g, f a :<: g) => Free g b
+type InjectTypeF f a b = forall g. (Functor (f a), Functor g, f a :<: g) => F g b
 
--- Given a natural transformation from f to g, lift (f a) to (Free f a) and transform it to (Free g a)
-injectFree :: (Functor f, Functor g, f :<: g) => f a -> Free g a
-injectFree = hoistFree inj . liftF
+-- Given a natural transformation from f to g, lift (f a) to (F f a) and transform it to (F g a)
+injectFree :: (Functor f, Functor g, f :<: g) => f a -> F g a
+injectFree = hoistF inj . liftF
 
-programExec :: (Monad m, Functor f, Interpretable m f) => Free f a -> m a
-programExec = iterM interpretM . toF
+programExec :: (Monad m, Functor f, Interpretable m f) => F f a -> m a
+programExec = iterM interpretM

@@ -27,18 +27,19 @@ module Program.Dog
   )
   where
 
-import           Control.Monad.Free (Free)
-import           Core.Types         ((:<:) (..))
-import           Module.Api         (ApiCommandF, apiGet)
-import           Module.Console     (ConsoleCommandF, consoleRead, consoleWrite)
-import           Module.Database    (DbCommandF, dbFetch, dbSave)
+import           Control.Monad.Free.Church (F)
+import           Core.Types                ((:<:))
+import           Module.Api                (ApiCommandF, apiGet)
+import           Module.Console            (ConsoleCommandF, consoleRead,
+                                            consoleWrite)
+import           Module.Database           (DbCommandF, dbFetch, dbSave)
 
 dog :: (Functor f,
         ConsoleCommandF String :<: f,
         ApiCommandF     String :<: f,
         DbCommandF      String :<: f)
     => Int
-    -> Free f Int
+    -> F f Int
 dog x = do
   consoleWrite "programB"
   consoleWrite =<< consoleRead

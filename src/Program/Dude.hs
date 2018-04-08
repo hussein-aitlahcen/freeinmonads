@@ -27,13 +27,13 @@ module Program.Dude
   )
   where
 
-import           Control.Monad.Free (Free)
-import           Core.Types         ((:<:) (..))
-import           Module.Api         (ApiCommandF)
-import           Module.Console     (ConsoleCommandF)
-import           Module.Database    (DbCommandF)
-import           Program.Cat        (cat)
-import           Program.Dog        (dog)
+import           Control.Monad.Free.Church (F)
+import           Core.Types                ((:<:))
+import           Module.Api                (ApiCommandF)
+import           Module.Console            (ConsoleCommandF)
+import           Module.Database           (DbCommandF)
+import           Program.Cat               (cat)
+import           Program.Dog               (dog)
 
 dude :: (Functor f,
         ConsoleCommandF String :<: f,
@@ -41,7 +41,7 @@ dude :: (Functor f,
         DbCommandF      String :<: f)
     => Int
     -> (Int -> String -> a)
-    -> Free f a
+    -> F f a
 dude k f = do
   x <- dog k
   y <- cat
