@@ -1,4 +1,4 @@
--- Dog.hs ---
+-- Dude.hs ---
 
 -- Copyright (C) 2018 Hussein Ait-Lahcen
 
@@ -21,28 +21,28 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module Program.Dog
+module Program.Dude
   (
-    dog
+    dude
   )
   where
 
 import           Control.Monad.Free (Free)
 import           Core.Types         ((:<:) (..))
-import           Module.Api         (ApiCommandF, apiGet)
-import           Module.Console     (ConsoleCommandF, consoleRead, consoleWrite)
-import           Module.Database    (DbCommandF, dbFetch, dbSave)
+import           Module.Api         (ApiCommandF)
+import           Module.Console     (ConsoleCommandF)
+import           Module.Database    (DbCommandF)
+import           Program.Cat        (cat)
+import           Program.Dog        (dog)
 
-dog :: (Functor f,
+dude :: (Functor f,
         ConsoleCommandF String :<: f,
         ApiCommandF     String :<: f,
         DbCommandF      String :<: f)
     => Int
-    -> Free f Int
-dog x = do
-  consoleWrite "programB"
-  consoleWrite =<< consoleRead
-  _ <- apiGet "http://localhost/users"
-  dbSave 10 =<< dbFetch 10
-  consoleWrite "end programB"
-  pure (x * x)
+    -> (Int -> String -> a)
+    -> Free f a
+dude k f = do
+  x <- dog k
+  y <- cat
+  pure (f x y)

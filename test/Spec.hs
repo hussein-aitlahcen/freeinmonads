@@ -17,20 +17,29 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import           Test.Hspec
+{-# LANGUAGE TypeOperators #-}
 
+import           Control.Monad.Free     (Free)
 import           Control.Monad.Identity (runIdentity)
 import           Core.Common            (programExec)
+import           Core.Types             ((:+:) (..))
+import           Data.Semigroup         ((<>))
+import           Module.Api
+import           Module.Console
+import           Module.Database
 import           Program.Cat            (cat)
 import           Program.Dog            (dog)
+import           Program.Dude           (dude)
+import           Test.Hspec
 
 main :: IO ()
 main = hspec $
   describe "how free am I in this monad ?" $
     it "is obviously freedom" $
       let
-        --- the interpreter is inferred
-        outputA = (runIdentity . programExec) cat
-        outputB = (runIdentity . programExec) dog
+        --- Top level explicit types
+        outputA = (runIdentity . programExec) (cat        :: Free (ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String) String)
+        outputB = (runIdentity . programExec) (dog 2      :: Free (ConsoleCommandF String :+: DbCommandF String :+: ApiCommandF String) Int)
+        outputC = (runIdentity . programExec) (dude 4 (\a b -> b <> show a) :: Free (DbCommandF String :+: ConsoleCommandF String :+: ApiCommandF String) String)
       in
-        (outputA, outputB) `shouldBe` ("Hello, World !", 4)
+        (outputA, outputB, outputC) `shouldBe` ("Hello, World !", 4, "Hello, World !16")

@@ -17,7 +17,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Program.Cat
   (
@@ -26,12 +28,16 @@ module Program.Cat
   where
 
 import           Control.Monad.Free (Free)
-import           Core.Types         ((:+:) (..))
+import           Core.Types         ((:<:) (..))
 import           Module.Api         (ApiCommandF, apiGet)
 import           Module.Console     (ConsoleCommandF, consoleRead, consoleWrite)
 import           Module.Database    (DbCommandF, dbFetch, dbSave)
 
-cat :: Free (ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String) String
+cat :: (Functor f,
+        ConsoleCommandF String :<: f,
+        ApiCommandF     String :<: f,
+        DbCommandF      String :<: f)
+    => Free f String
 cat = do
   consoleWrite "programA"
   consoleWrite =<< consoleRead
