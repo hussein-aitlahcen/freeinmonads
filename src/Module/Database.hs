@@ -42,7 +42,7 @@ data DbCommandF a n = FetchF ObjectId (a -> n)
                     | SaveF ObjectId a n
 
 instance Functor (DbCommandF a) where
-  fmap g (FetchF i f)  = FetchF i (g . f)
+  fmap g (FetchF i f)  = FetchF i (g <$> f)
   fmap f (SaveF i x y) = SaveF i x (f y)
 
 instance Interpretable Identity (DbCommandF String) where

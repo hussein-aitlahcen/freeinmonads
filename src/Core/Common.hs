@@ -37,7 +37,7 @@ type InjectTypeF f a b = forall g. (Functor (f a), Functor g, f a :<: g) => F g 
 
 -- Given a natural transformation from f to g, lift (f a) to (F f a) and transform it to (F g a)
 injectFree :: (Functor f, Functor g, f :<: g) => f a -> F g a
-injectFree = hoistF inj . liftF
+injectFree = hoistF inj <$> liftF
 
 programExec :: (Monad m, Functor f, Interpretable m f) => F f a -> m a
 programExec = iterM interpretM

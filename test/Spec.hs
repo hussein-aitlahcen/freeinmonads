@@ -40,8 +40,8 @@ main = hspec $
     it "is obviously freedom" $
       let
         --- Top level explicit types
-        outputA = (runIdentity . programExec) (cat                          :: F FixedProgram String)
-        outputB = (runIdentity . programExec) (dog 2                        :: F FixedProgram Int)
-        outputC = (runIdentity . programExec) (dude 4 (\a b -> b <> show a) :: F FixedProgram String)
+        outputA = (runIdentity <$> programExec) (cat                          :: F FixedProgram String)
+        outputB = (runIdentity <$> programExec) (dog 2                        :: F FixedProgram Int)
+        outputC = (runIdentity <$> programExec) (dude 4 (\a b -> b <> show a) :: F FixedProgram String)
       in
         (outputA, outputB, outputC) `shouldBe` ("Hello, World !", 4, "Hello, World !16")
