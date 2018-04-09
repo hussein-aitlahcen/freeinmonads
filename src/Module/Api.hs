@@ -40,7 +40,7 @@ type Url = String
 data ApiCommandF a n = GetF Url (a -> n)
 
 instance Functor (ApiCommandF a) where
-  fmap g (GetF url f) = GetF url (g . f)
+  fmap g (GetF url f) = GetF url (g <$> f)
 
 instance Interpretable Identity (ApiCommandF String) where
   interpretM (GetF _ f) = f "Hello, World !"
