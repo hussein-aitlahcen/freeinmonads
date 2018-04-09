@@ -53,8 +53,8 @@ instance Interpretable IO (DbCommandF String) where
   interpretM (FetchF i f)  = f (show i)
   interpretM (SaveF i _ f) = putStrLn ("effectful computation: " ++ show i) >> f
 
-dbFetch :: ObjectId -> InjectTypeF DbCommandF String String
+dbFetch :: ObjectId -> InjectTypeF (DbCommandF String) String
 dbFetch i = injectFree (FetchF i id)
 
-dbSave :: ObjectId -> String -> InjectTypeF DbCommandF String ()
+dbSave :: ObjectId -> String -> InjectTypeF (DbCommandF String) ()
 dbSave i s = injectFree (SaveF i s ())

@@ -48,5 +48,5 @@ instance Interpretable Identity (ApiCommandF String) where
 instance Interpretable IO (ApiCommandF String) where
   interpretM (GetF _ f) = f =<< getLine
 
-apiGet :: Url -> InjectTypeF ApiCommandF String String
+apiGet :: Url -> InjectTypeF (ApiCommandF String) String
 apiGet s = injectFree (GetF s id)

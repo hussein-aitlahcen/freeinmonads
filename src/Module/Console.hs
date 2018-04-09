@@ -50,8 +50,8 @@ instance Interpretable IO (ConsoleCommandF String) where
   interpretM (ReadF f)    = f =<< getLine
   interpretM (WriteF v f) = putStrLn v >> f
 
-consoleRead :: InjectTypeF ConsoleCommandF String String
+consoleRead :: InjectTypeF (ConsoleCommandF String) String
 consoleRead = injectFree (ReadF id)
 
-consoleWrite :: String -> InjectTypeF ConsoleCommandF String ()
+consoleWrite :: String -> InjectTypeF (ConsoleCommandF String) ()
 consoleWrite v = injectFree (WriteF v ())
