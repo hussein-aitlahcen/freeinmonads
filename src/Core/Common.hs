@@ -32,10 +32,8 @@ module Core.Common
 import           Control.Monad.Free.Church (F (..), hoistF, iterM, liftF)
 import           Core.Types                ((:<:) (..), Interpretable (..))
 
--- Intermediate type used to fix `f a b` and let the compiler infers `g`
 type InjectTypeF f b = forall g. (Functor f, Functor g, f :<: g) => F g b
 
--- Given a natural transformation from f to g, lift (f a) to (F f a) and transform it to (F g a)
 injectFree :: (Functor f, Functor g, f :<: g) => f a -> F g a
 injectFree = hoistF inj <$> liftF
 
