@@ -33,8 +33,9 @@ module Module.Database
   where
 
 import           Control.Monad.Identity (Identity)
-import           Core.Common            (InjectTypeF, injectFree)
+import           Core.Common            (InjectTypeF, injectF)
 import           Core.Types             (Interpretable (..))
+import           Data.Semigroup         ((<>))
 
 type ObjectId = Int
 
@@ -51,10 +52,10 @@ instance Interpretable Identity (DbCommandF String) where
 
 instance Interpretable IO (DbCommandF String) where
   interpretM (FetchF i f)  = f (show i)
-  interpretM (SaveF i _ f) = putStrLn ("effectful computation: " ++ show i) >> f
+  interpretM (SaveF i _ f) = putStrLn ("effectful computation: " <> show i) >> f
 
-dbFetch :: ObjectId -> InjectTypeF (DbCommandF String) String
-dbFetch i = injectFree (FetchF i id)
+dbFetch :: ObjectId -> InjectTypeF (DbCommandF a) a
+dbFetch i = injectF (FetchF i id)
 
-dbSave :: ObjectId -> String -> InjectTypeF (DbCommandF String) ()
-dbSave i s = injectFree (SaveF i s ())
+dbSave :: ObjectId -> a -> InjectTypeF (DbCommandF a) ()
+dbSave i x = injectF (SaveF i x ())

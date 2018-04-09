@@ -17,9 +17,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Program.Cat
   (
@@ -41,8 +41,10 @@ cat :: (Functor f,
     => F f String
 cat = do
   consoleWrite "programA"
-  consoleWrite =<< consoleRead
+  input :: String <- consoleRead
+  consoleWrite input
   apiValue <- apiGet "http://localhost/users"
-  dbSave 10 =<< dbFetch 10
+  dbObject :: String <- dbFetch 10
+  dbSave 10 dbObject
   consoleWrite "end programA"
   pure apiValue

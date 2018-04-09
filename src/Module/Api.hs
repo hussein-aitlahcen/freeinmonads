@@ -31,9 +31,9 @@ module Module.Api
   )
   where
 
-import           Control.Monad.Identity (Identity)
-import           Core.Common            (InjectTypeF, injectFree)
-import           Core.Types             (Interpretable (..))
+import           Control.Monad.Identity    (Identity)
+import           Core.Common               (injectF, InjectTypeF)
+import           Core.Types                (Interpretable (..))
 
 type Url = String
 
@@ -48,5 +48,5 @@ instance Interpretable Identity (ApiCommandF String) where
 instance Interpretable IO (ApiCommandF String) where
   interpretM (GetF _ f) = f =<< getLine
 
-apiGet :: Url -> InjectTypeF (ApiCommandF String) String
-apiGet s = injectFree (GetF s id)
+apiGet :: Url -> InjectTypeF (ApiCommandF a) a
+apiGet s = injectF (GetF s id)

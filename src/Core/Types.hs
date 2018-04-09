@@ -20,7 +20,6 @@
 {-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE TypeOperators         #-}
 
 module Core.Types
@@ -44,21 +43,15 @@ data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
 
 class (Functor f, Functor g) => f :<: g where
   inj :: f a -> g a
-  proj :: g a -> Maybe (f a)
 
 instance Functor f => f :<: f where
   inj = id
-  proj = Just
 
 instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
   inj = InR
-  proj (InR fa) = Just fa
-  proj _        = Nothing
 
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
   inj = InL <$> inj
-  proj (InL gfa) = proj gfa
-  proj _         = Nothing
 
 class (Monad m, Functor f) => Interpretable m f where
   interpretM :: f (m a) -> m a

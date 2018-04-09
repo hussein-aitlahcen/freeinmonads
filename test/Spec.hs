@@ -21,7 +21,7 @@
 
 import           Control.Monad.Free.Church (F)
 import           Control.Monad.Identity    (runIdentity)
-import           Core.Common               (programExec)
+import           Core.Common               (execF)
 import           Core.Types                ((:+:) (..))
 import           Data.Semigroup            ((<>))
 import           Module.Api
@@ -40,8 +40,8 @@ main = hspec $
     it "is obviously freedom" $
       let
         --- Top level explicit types
-        outputA = (runIdentity <$> programExec) (cat                          :: F FixedProgram String)
-        outputB = (runIdentity <$> programExec) (dog 2                        :: F FixedProgram Int)
-        outputC = (runIdentity <$> programExec) (dude 4 (\a b -> b <> show a) :: F FixedProgram String)
+        outputA = (runIdentity <$> execF) (cat                          :: F FixedProgram String)
+        outputB = (runIdentity <$> execF) (dog 2                        :: F FixedProgram Int)
+        outputC = (runIdentity <$> execF) (dude 4 (\a b -> b <> show a) :: F FixedProgram String)
       in
         (outputA, outputB, outputC) `shouldBe` ("Hello, World !", 4, "Hello, World !16")

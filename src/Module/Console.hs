@@ -32,7 +32,7 @@ module Module.Console
   where
 
 import           Control.Monad.Identity (Identity)
-import           Core.Common            (InjectTypeF, injectFree)
+import           Core.Common            (InjectTypeF, injectF)
 import           Core.Types             (Interpretable (..))
 
 data ConsoleCommandF a n = ReadF (a -> n)
@@ -50,8 +50,8 @@ instance Interpretable IO (ConsoleCommandF String) where
   interpretM (ReadF f)    = f =<< getLine
   interpretM (WriteF v f) = putStrLn v >> f
 
-consoleRead :: InjectTypeF (ConsoleCommandF String) String
-consoleRead = injectFree (ReadF id)
+consoleRead :: InjectTypeF (ConsoleCommandF a) a
+consoleRead = injectF (ReadF id)
 
-consoleWrite :: String -> InjectTypeF (ConsoleCommandF String) ()
-consoleWrite v = injectFree (WriteF v ())
+consoleWrite :: a -> InjectTypeF (ConsoleCommandF a) ()
+consoleWrite x = injectF (WriteF x ())

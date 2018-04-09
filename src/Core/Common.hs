@@ -17,25 +17,24 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE TypeOperators         #-}
 
 module Core.Common
   (
     InjectTypeF,
-    injectFree,
-    programExec
+    injectF,
+    execF
   )
   where
 
-import           Control.Monad.Free.Church (F (..), hoistF, iterM, liftF)
+import           Control.Monad.Free.Church (F (..), iterM, liftF)
 import           Core.Types                ((:<:) (..), Interpretable (..))
 
-type InjectTypeF f b = forall g. (Functor f, Functor g, f :<: g) => F g b
+type InjectTypeF f n = forall g. (Functor f, Functor g, f :<: g) => F g n
 
-injectFree :: (Functor f, Functor g, f :<: g) => f a -> F g a
-injectFree = hoistF inj <$> liftF
+injectF :: (f :<: g) => f a -> F g a
+injectF = liftF <$> inj
 
-programExec :: (Monad m, Functor f, Interpretable m f) => F f a -> m a
-programExec = iterM interpretM
+execF :: (Monad m, Functor f, Interpretable m f) => F f a -> m a
+execF = iterM interpretM

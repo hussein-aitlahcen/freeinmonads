@@ -17,9 +17,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Program.Dog
   (
@@ -42,8 +42,10 @@ dog :: (Functor f,
     -> F f Int
 dog x = do
   consoleWrite "programB"
-  consoleWrite =<< consoleRead
-  _ <- apiGet "http://localhost/users"
-  dbSave 10 =<< dbFetch 10
+  input :: String <- consoleRead
+  consoleWrite input
+  _ :: String <- apiGet "http://localhost/users"
+  dbObject :: String <- dbFetch 10
+  dbSave 10 dbObject
   consoleWrite "end programB"
   pure (x * x)
