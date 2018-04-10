@@ -24,9 +24,9 @@ import           Control.Monad.Identity    (runIdentity)
 import           Core.Common               (execF)
 import           Core.Types                ((:+:) (..))
 import           Data.Semigroup            ((<>))
-import           Module.Api
-import           Module.Console
-import           Module.Database
+import           Module.Api                (ApiCommandF)
+import           Module.Console            (ConsoleCommandF)
+import           Module.Database           (DbCommandF)
 import           Program.Cat               (cat)
 import           Program.Dog               (dog)
 import           Program.Dude              (dude)
