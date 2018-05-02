@@ -19,6 +19,7 @@
 
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MonoLocalBinds        #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
@@ -35,8 +36,9 @@ import           Control.Monad.Identity (Identity)
 import           Core.Common            (InjectTypeF, injectF)
 import           Core.Types             (Interpretable (..))
 
-data ConsoleCommandF a n = ReadF (a -> n)
-                         | WriteF a n
+data ConsoleCommandF a n where
+  ReadF :: (a -> n) -> ConsoleCommandF a n
+  WriteF :: a -> n -> ConsoleCommandF a n
 
 instance Functor (ConsoleCommandF a) where
   fmap g (ReadF f)    = ReadF (g . f)

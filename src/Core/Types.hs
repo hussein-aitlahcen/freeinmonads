@@ -19,6 +19,7 @@
 
 {-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators         #-}
 
@@ -39,7 +40,13 @@ http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 
 ####################################################################
 -}
-data (:+:) f g e = InL (f e) | InR (g e) deriving Functor
+data (:+:) f g a where
+  InL :: f a -> (:+:) f g a
+  InR :: g a -> (:+:) f g a
+
+instance (Functor f, Functor g) => Functor ((:+:) f g) where
+  fmap f (InL fa) = InL (fmap f fa)
+  fmap f (InR ga) = InR (fmap f ga)
 
 class (Functor f, Functor g) => f :<: g where
   inj :: f a -> g a
@@ -47,7 +54,7 @@ class (Functor f, Functor g) => f :<: g where
 instance Functor f => f :<: f where
   inj = id
 
-instance (Functor f, Functor g) => g :<: (f :+: g) where
+instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
   inj = InR
 
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where

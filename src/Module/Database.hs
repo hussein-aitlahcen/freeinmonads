@@ -19,6 +19,7 @@
 
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MonoLocalBinds        #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
@@ -36,8 +37,9 @@ import           Core.Common            (InjectTypeF, injectF)
 import           Core.Types             (Interpretable (..))
 import           Data.Semigroup         ((<>))
 
-data DbCommandF i a n = FetchF i (a -> n)
-                    | SaveF i a n
+data DbCommandF i a n where
+  FetchF :: i -> (a -> n) -> DbCommandF i a n
+  SaveF :: i -> a -> n -> DbCommandF i a n
 
 instance Functor (DbCommandF i a) where
   fmap g (FetchF x f)  = FetchF x (g . f)

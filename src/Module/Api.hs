@@ -19,6 +19,7 @@
 
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MonoLocalBinds        #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
@@ -34,7 +35,8 @@ import           Control.Monad.Identity (Identity)
 import           Core.Common            (InjectTypeF, injectF)
 import           Core.Types             (Interpretable (..))
 
-data ApiCommandF u a n = GetF u (a -> n)
+data ApiCommandF u a n where
+  GetF :: u -> (a -> n) -> ApiCommandF u a n
 
 instance Functor (ApiCommandF u a) where
   fmap g (GetF url f) = GetF url (g . f)
