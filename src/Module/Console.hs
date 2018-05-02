@@ -39,7 +39,7 @@ data ConsoleCommandF a n = ReadF (a -> n)
                          | WriteF a n
 
 instance Functor (ConsoleCommandF a) where
-  fmap g (ReadF f)    = ReadF (g <$> f)
+  fmap g (ReadF f)    = ReadF (g . f)
   fmap f (WriteF x y) = WriteF x (f y)
 
 instance Interpretable Identity (ConsoleCommandF String) where

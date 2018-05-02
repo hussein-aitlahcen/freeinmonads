@@ -35,9 +35,9 @@ import           Module.Console            (ConsoleCommandF, consoleRead,
 import           Module.Database           (DbCommandF, dbFetch, dbSave)
 
 dog :: (Functor f,
-        ConsoleCommandF String :<: f,
-        ApiCommandF     String :<: f,
-        DbCommandF      String :<: f)
+        ConsoleCommandF String        :<: f,
+        ApiCommandF     String String :<: f,
+        DbCommandF      Int    String :<: f)
     => Int
     -> F f Int
 dog x = do
@@ -45,7 +45,7 @@ dog x = do
   input :: String <- consoleRead
   consoleWrite input
   _ :: String <- apiGet "http://localhost/users"
-  dbObject :: String <- dbFetch 10
-  dbSave 10 dbObject
+  dbObject :: String <- dbFetch (10 :: Int)
+  dbSave (10 :: Int) dbObject
   consoleWrite "end programB"
   pure (x * x)

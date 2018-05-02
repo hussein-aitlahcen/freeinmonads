@@ -32,7 +32,9 @@ import           Program.Dog               (dog)
 import           Program.Dude              (dude)
 import           Test.Hspec
 
-type FixedProgram = ApiCommandF String :+: DbCommandF String :+: ConsoleCommandF String
+type FixedProgram =     ApiCommandF     String String
+                    :+: DbCommandF      Int    String
+                    :+: ConsoleCommandF String
 
 main :: IO ()
 main = hspec $
@@ -40,8 +42,8 @@ main = hspec $
     it "is obviously freedom" $
       let
         --- Top level explicit types
-        outputA = (runIdentity <$> execF) (cat                          :: F FixedProgram String)
-        outputB = (runIdentity <$> execF) (dog 2                        :: F FixedProgram Int)
-        outputC = (runIdentity <$> execF) (dude 4 (\a b -> b <> show a) :: F FixedProgram String)
+        outputA = (runIdentity . execF) (cat                          :: F FixedProgram String)
+        outputB = (runIdentity . execF) (dog 2                        :: F FixedProgram Int)
+        outputC = (runIdentity . execF) (dude 4 (\a b -> b <> show a) :: F FixedProgram String)
       in
         (outputA, outputB, outputC) `shouldBe` ("Hello, World !", 4, "Hello, World !16")

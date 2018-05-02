@@ -25,28 +25,25 @@
 
 module Module.Api
   (
-    Url,
     ApiCommandF (..),
     apiGet
   )
   where
 
-import           Control.Monad.Identity    (Identity)
-import           Core.Common               (injectF, InjectTypeF)
-import           Core.Types                (Interpretable (..))
+import           Control.Monad.Identity (Identity)
+import           Core.Common            (InjectTypeF, injectF)
+import           Core.Types             (Interpretable (..))
 
-type Url = String
+data ApiCommandF u a n = GetF u (a -> n)
 
-data ApiCommandF a n = GetF Url (a -> n)
+instance Functor (ApiCommandF u a) where
+  fmap g (GetF url f) = GetF url (g . f)
 
-instance Functor (ApiCommandF a) where
-  fmap g (GetF url f) = GetF url (g <$> f)
-
-instance Interpretable Identity (ApiCommandF String) where
+instance Interpretable Identity (ApiCommandF u String) where
   interpretM (GetF _ f) = f "Hello, World !"
 
-instance Interpretable IO (ApiCommandF String) where
+instance Interpretable IO (ApiCommandF u String) where
   interpretM (GetF _ f) = f =<< getLine
 
-apiGet :: Url -> InjectTypeF (ApiCommandF a) a
-apiGet s = injectF (GetF s id)
+apiGet :: u -> InjectTypeF (ApiCommandF u a) a
+apiGet url = injectF (GetF url id)

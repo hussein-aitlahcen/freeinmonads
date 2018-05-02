@@ -34,7 +34,7 @@ import           Core.Types                ((:<:) (..), Interpretable (..))
 type InjectTypeF f n = forall g. (Functor f, Functor g, f :<: g) => F g n
 
 injectF :: (f :<: g) => f a -> F g a
-injectF = liftF <$> inj
+injectF = liftF . inj
 
 execF :: (Monad m, Functor f, Interpretable m f) => F f a -> m a
 execF = iterM interpretM

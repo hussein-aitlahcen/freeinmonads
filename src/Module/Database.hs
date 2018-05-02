@@ -25,7 +25,6 @@
 
 module Module.Database
   (
-    ObjectId,
     DbCommandF (..),
     dbFetch,
     dbSave
@@ -37,25 +36,23 @@ import           Core.Common            (InjectTypeF, injectF)
 import           Core.Types             (Interpretable (..))
 import           Data.Semigroup         ((<>))
 
-type ObjectId = Int
+data DbCommandF i a n = FetchF i (a -> n)
+                    | SaveF i a n
 
-data DbCommandF a n = FetchF ObjectId (a -> n)
-                    | SaveF ObjectId a n
+instance Functor (DbCommandF i a) where
+  fmap g (FetchF x f)  = FetchF x (g . f)
+  fmap f (SaveF x y z) = SaveF x y (f z)
 
-instance Functor (DbCommandF a) where
-  fmap g (FetchF i f)  = FetchF i (g <$> f)
-  fmap f (SaveF i x y) = SaveF i x (f y)
-
-instance Interpretable Identity (DbCommandF String) where
-  interpretM (FetchF i f)  = f (show i)
+instance (Show i) => Interpretable Identity (DbCommandF i String) where
+  interpretM (FetchF x f)  = f (show x)
   interpretM (SaveF _ _ f) = f
 
-instance Interpretable IO (DbCommandF String) where
-  interpretM (FetchF i f)  = f (show i)
-  interpretM (SaveF i _ f) = putStrLn ("effectful computation: " <> show i) >> f
+instance (Show i) => Interpretable IO (DbCommandF i String) where
+  interpretM (FetchF x f)  = f (show x)
+  interpretM (SaveF x _ f) = putStrLn ("effectful computation: " <> show x) >> f
 
-dbFetch :: ObjectId -> InjectTypeF (DbCommandF a) a
-dbFetch i = injectF (FetchF i id)
+dbFetch :: i -> InjectTypeF (DbCommandF i a) a
+dbFetch x = injectF (FetchF x id)
 
-dbSave :: ObjectId -> a -> InjectTypeF (DbCommandF a) ()
-dbSave i x = injectF (SaveF i x ())
+dbSave :: i -> a -> InjectTypeF (DbCommandF i a) ()
+dbSave x y = injectF (SaveF x y ())

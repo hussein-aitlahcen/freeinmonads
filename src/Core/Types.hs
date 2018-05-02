@@ -47,11 +47,11 @@ class (Functor f, Functor g) => f :<: g where
 instance Functor f => f :<: f where
   inj = id
 
-instance {-# OVERLAPS #-} (Functor f, Functor g) => g :<: (f :+: g) where
+instance (Functor f, Functor g) => g :<: (f :+: g) where
   inj = InR
 
 instance (Functor f, Functor g, Functor h, f :<: g) => f :<: (g :+: h) where
-  inj = InL <$> inj
+  inj = InL . inj
 
 class (Monad m, Functor f) => Interpretable m f where
   interpretM :: f (m a) -> m a

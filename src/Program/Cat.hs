@@ -35,16 +35,16 @@ import           Module.Console            (ConsoleCommandF, consoleRead,
 import           Module.Database           (DbCommandF, dbFetch, dbSave)
 
 cat :: (Functor f,
-        ConsoleCommandF String :<: f,
-        ApiCommandF     String :<: f,
-        DbCommandF      String :<: f)
+        ConsoleCommandF String        :<: f,
+        ApiCommandF     String String :<: f,
+        DbCommandF      Int    String :<: f)
     => F f String
 cat = do
   consoleWrite "programA"
   input :: String <- consoleRead
   consoleWrite input
   apiValue <- apiGet "http://localhost/users"
-  dbObject :: String <- dbFetch 10
-  dbSave 10 dbObject
+  dbObject :: String <- dbFetch (10 :: Int)
+  dbSave (10 :: Int) dbObject
   consoleWrite "end programA"
   pure apiValue

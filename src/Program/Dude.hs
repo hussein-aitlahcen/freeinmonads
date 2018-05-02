@@ -17,8 +17,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeOperators    #-}
 
 module Program.Dude
   (
@@ -35,9 +35,9 @@ import           Program.Cat               (cat)
 import           Program.Dog               (dog)
 
 dude :: (Functor f,
-        ConsoleCommandF String :<: f,
-        ApiCommandF     String :<: f,
-        DbCommandF      String :<: f)
+        ConsoleCommandF String        :<: f,
+        ApiCommandF     String String :<: f,
+        DbCommandF      Int    String :<: f)
     => Int
     -> (Int -> String -> a)
     -> F f a
