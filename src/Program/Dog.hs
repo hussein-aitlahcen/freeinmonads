@@ -45,7 +45,10 @@ dog x = do
   input :: String <- consoleRead
   consoleWrite input
   _ :: String <- apiGet "http://localhost/users"
-  dbObject :: String <- dbFetch (10 :: Int)
-  dbSave (10 :: Int) dbObject
+  dbObject :: String <- dbFetch objectId
+  dbSave objectId dbObject
   consoleWrite "end programB"
   pure (x * x)
+  where
+    objectId :: Int
+    objectId = 10

@@ -44,7 +44,11 @@ cat = do
   input :: String <- consoleRead
   consoleWrite input
   apiValue <- apiGet "http://localhost/users"
-  dbObject :: String <- dbFetch (10 :: Int)
-  dbSave (10 :: Int) dbObject
+  dbObject :: String <- dbFetch objectId
+  dbSave objectId dbObject
   consoleWrite "end programA"
   pure apiValue
+  where
+    objectId :: Int
+    objectId = 10
+
