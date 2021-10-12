@@ -35,7 +35,7 @@ module Core.Types
 ####################################################################
 
                           Abstract types
-          Credits to DataTypes A La Carte by Wounder Swierstra
+          Credits to DataTypes A La Carte by Wouter Swierstra
 http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 
 ####################################################################
